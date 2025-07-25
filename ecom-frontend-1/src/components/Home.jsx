@@ -82,8 +82,7 @@ const Home = () => {
                     marginBottom: "5px",
                   }}
                 >
-                  <i className="bi bi-currency-rupee"></i>
-                  {product.price}
+                  Rs. {product.price}
                 </h5>
               </div>
               <button
