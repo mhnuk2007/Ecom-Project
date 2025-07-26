@@ -6,6 +6,7 @@ A Spring Boot-based RESTful API for an e-commerce platform with product manageme
 
 - **Product Management**: Create, read, update, and delete products
 - **Image Upload**: Support for product image uploads with multipart file handling
+- **Product Search**: Search products by name, description, brand, or category
 - **Database Integration**: PostgreSQL database with JPA/Hibernate
 - **RESTful API**: Clean REST endpoints with proper HTTP status codes
 - **CORS Support**: Configured for frontend integration
@@ -75,6 +76,7 @@ The application will start on `http://localhost:8080`
 | POST | `/api/product` | Create new product | Multipart form data |
 | PUT | `/api/product/{id}` | Update product by ID | Multipart form data |
 | DELETE | `/api/product/{id}` | Delete product by ID | - |
+| GET | `/api/products/search` | Search products by keyword (name, description, brand, or category) | Query parameter: `keyword` |
 
 ### API Examples
 
@@ -146,6 +148,29 @@ _Response:_
 "Deleted successfully"
 ```
 
+#### Search Products
+```http
+GET http://localhost:8080/api/products/search?keyword=iphone
+```
+_Response:_
+```json
+[
+  {
+    "id": 1,
+    "name": "iPhone 15",
+    "description": "Latest iPhone model",
+    "brand": "Apple",
+    "category": "Electronics",
+    "releaseDate": "15-09-2023",
+    "productAvailable": true,
+    "stockQuantity": 50,
+    "price": 999.99,
+    "imageName": "iphone15.jpg",
+    "imageType": "image/jpeg"
+  }
+]
+```
+
 ## 🗂️ Project Structure
 
 ```
@@ -205,7 +230,6 @@ spring.jpa.show-sql=true
 
 ## 🚧 Upcoming Features
 
-- [ ] Product search and filtering
 - [ ] Pagination for product listings
 - [ ] User authentication and authorization
 - [ ] Order management system
@@ -235,3 +259,9 @@ For questions or support, please contact:
 - Spring Boot team for the excellent framework
 - PostgreSQL community for the robust database
 - Lombok project for reducing boilerplate code
+
+## 📝 Technical Notes
+
+- Product images are stored as `byte[]` in the database and can be retrieved via the image endpoint.
+- The search endpoint (`/api/products/search`) logs the search keyword to the server console for debugging.
+- Database connection uses `spring.datasource.hikari.auto-commit=false` for better transaction control (see `application.properties`).
