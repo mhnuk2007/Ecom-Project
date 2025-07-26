@@ -56,7 +56,7 @@ public class ProductController {
         Product updatedProduct = null;
         try {
             updatedProduct = productService.addOrUpdateProduct(product, imageFile);
-            return new ResponseEntity<>("", HttpStatus.OK);
+            return new ResponseEntity<>("Updated successfully", HttpStatus.OK);
         } catch (IOException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -66,7 +66,7 @@ public class ProductController {
     public ResponseEntity<String> deleteProduct(@PathVariable int id) {
         try {
             productService.deleteProduct(id);
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>("Deleted successfully", HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
