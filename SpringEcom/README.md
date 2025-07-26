@@ -73,6 +73,8 @@ The application will start on `http://localhost:8080`
 | GET | `/api/product/{id}` | Get product by ID | - |
 | GET | `/api/product/{id}/image` | Get product image | - |
 | POST | `/api/product` | Create new product | Multipart form data |
+| PUT | `/api/product/{id}` | Update product by ID | Multipart form data |
+| DELETE | `/api/product/{id}` | Delete product by ID | - |
 
 ### API Examples
 
@@ -109,6 +111,39 @@ Content-Type: multipart/form-data
 #### Get Product Image
 ```http
 GET http://localhost:8080/api/product/1/image
+```
+
+#### Update Product
+```http
+PUT http://localhost:8080/api/product/1
+Content-Type: multipart/form-data
+
+{
+  "product": {
+    "name": "iPhone 15 Pro",
+    "description": "Updated iPhone model",
+    "brand": "Apple",
+    "category": "Electronics",
+    "releaseDate": "15-09-2023",
+    "productAvailable": true,
+    "stockQuantity": 50,
+    "price": 999.99
+  },
+  "imageFile": [binary image data]
+}
+```
+_Response:_
+```json
+"Updated successfully"
+```
+
+#### Delete Product
+```http
+DELETE http://localhost:8080/api/product/1
+```
+_Response:_
+```json
+"Deleted successfully"
 ```
 
 ## 🗂️ Project Structure
@@ -170,8 +205,6 @@ spring.jpa.show-sql=true
 
 ## 🚧 Upcoming Features
 
-- [ ] Update product endpoint (PUT)
-- [ ] Delete product endpoint (DELETE)
 - [ ] Product search and filtering
 - [ ] Pagination for product listings
 - [ ] User authentication and authorization
@@ -194,7 +227,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📞 Contact
 
 For questions or support, please contact:
-- LinkedIn: https://www.linkedin.com/in/mohan-lal-b79790126/
+- LinkedIn:[Mohan Lal] https://www.linkedin.com/in/mohan-lal-b79790126/
 - GitHub: [@mhnuk2007](https://github.com/mhnuk2007)
 
 ## 🙏 Acknowledgments
