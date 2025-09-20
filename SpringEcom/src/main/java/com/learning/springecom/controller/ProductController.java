@@ -74,10 +74,14 @@ public class ProductController {
 
 
     @PutMapping("/product/{id}")
-    public ResponseEntity<String> updateProduct(@PathVariable int id, @RequestPart Product product, @RequestPart MultipartFile imageFile) {
-        Product updatedProduct = null;
+    public ResponseEntity<String> updateProduct(
+            @PathVariable int id,
+            @RequestPart Product product,
+            @RequestPart(required = false) MultipartFile imageFile) {
+
         try {
-            updatedProduct = productService.addOrUpdateProduct(product, imageFile);
+            product.setId(id); // Ensure the ID is set
+            Product updatedProduct = productService.addOrUpdateProduct(product, imageFile);
             return new ResponseEntity<>("Updated successfully", HttpStatus.OK);
         } catch (IOException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

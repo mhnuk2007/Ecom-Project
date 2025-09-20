@@ -65,46 +65,49 @@ const UpdateProduct = () => {
     return file;
   }
  
-  const handleSubmit = async(e) => {
+const handleSubmit = async(e) => {
     setLoading(true);
     e.preventDefault();
-    console.log("images", image)
-    console.log("productsdfsfsf", updateProduct)
+    
     const updatedProduct = new FormData();
+    
+    // Only append image if user selected a new one
     if (imageChanged && image) {
-      updatedProduct.append("imageFile", image);
-    } else {
-      // Send null or empty value when no image is selected by user
-      updatedProduct.append("imageFile", null);
+        updatedProduct.append("imageFile", image);
     }
     
+    // Ensure ID is included in the product object
+    const productData = {
+        ...updateProduct,
+        id: parseInt(id) // Ensure ID is set
+    };
+    
     updatedProduct.append(
-      "product",
-      new Blob([JSON.stringify(updateProduct)], { type: "application/json" })
+        "product",
+        new Blob([JSON.stringify(productData)], { type: "application/json" })
     );
-  
 
-  console.log("formData : ", updatedProduct)
-    axios
-      .put(`${baseUrl}/api/product/${id}`, updatedProduct, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      })
-      .then((response) => {
-        console.log("Product updated successfully:", updatedProduct);
-        toast.success("product updated successfully")
-      })
-      .catch((error) => {
+    try {
+        const response = await axios.put(
+            `${baseUrl}/api/product/${id}`, 
+            updatedProduct, 
+            {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            }
+        );
+        
+        console.log("Product updated successfully:", response.data);
+        toast.success("Product updated successfully");
+        navigate('/');
+    } catch (error) {
         console.error("Error updating product:", error);
-        console.log("product unsuccessfull update",updateProduct)
         toast.error("Failed to update product. Please try again.");
-      }).finally(()=>{
-        setLoading(false)
-        navigate('/')
-      }
-      );
-  };
+    } finally {
+        setLoading(false);
+    }
+};
  
 
   const handleChange = (e) => {
@@ -223,6 +226,7 @@ const UpdateProduct = () => {
                     <option value="">Select category</option>
                     <option value="Laptop">Laptop</option>
                     <option value="Headphone">Headphone</option>
+                    <option value="Accessories">Accessories</option>
                     <option value="Mobile">Mobile</option>
                     <option value="Electronics">Electronics</option>
                     <option value="Toys">Toys</option>
