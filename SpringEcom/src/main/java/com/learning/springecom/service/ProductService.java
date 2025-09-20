@@ -36,9 +36,20 @@ public class ProductService {
     }
 
     public Product addOrUpdateProduct(Product product, MultipartFile image) throws IOException {
-        product.setImageName(image.getOriginalFilename());
-        product.setImageType(image.getContentType());
-        product.setImageData(image.getBytes());
+        // Only update image fields if a new image is provided
+        if (image != null && !image.isEmpty()) {
+            product.setImageName(image.getOriginalFilename());
+            product.setImageType(image.getContentType());
+            product.setImageData(image.getBytes());
+        } else if (product.getId() > 0) {
+            // For updates, preserve existing image data if no new image provided
+            Product existingProduct = productRepo.findById(product.getId()).orElse(null);
+            if (existingProduct != null) {
+                product.setImageName(existingProduct.getImageName());
+                product.setImageType(existingProduct.getImageType());
+                product.setImageData(existingProduct.getImageData());
+            }
+        }
         return productRepo.save(product);
     }
 
