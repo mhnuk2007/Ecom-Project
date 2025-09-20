@@ -30,22 +30,23 @@ const Home = ({ selectedCategory }) => {
     return () => clearTimeout(toastTimer);
   }, [showToast]);
 
-  // Function to convert base64 string to data URL
-  const convertBase64ToDataURL = (base64String, mimeType = 'image/jpeg') => {
-    if (!base64String) return unplugged; // Return fallback image if no data
-    
-    // If it's already a data URL, return as is
-    if (base64String.startsWith('data:')) {
-      return base64String;
+  // Function to get product image URL or fallback
+  const baseUrl = import.meta.env.VITE_BASE_URL;
+  const getProductImageSrc = (product) => {
+    // If productImage exists and is valid, use it
+    if (product.productImage) {
+      if (product.productImage.startsWith('data:') || product.productImage.startsWith('http')) {
+        return product.productImage;
+      }
+      // Assume base64 string
+      return `data:image/jpeg;base64,${product.productImage}`;
     }
-    
-    // If it's already a URL, return as is
-    if (base64String.startsWith('http')) {
-      return base64String;
+    // If imageName exists, construct image URL
+    if (product.imageName) {
+      return `${baseUrl}/api/product/${product.id}/image`;
     }
-    
-    // Convert base64 string to data URL
-    return `data:${mimeType};base64,${base64String}`;
+    // Fallback image
+    return unplugged;
   };
 
   const handleAddToCart = (e, product) => {
@@ -93,7 +94,7 @@ const Home = ({ selectedCategory }) => {
             {toastProduct && (
               <div className="d-flex align-items-center">
                 <img 
-                  src={convertBase64ToDataURL(toastProduct.productImage)} 
+                  src={getProductImageSrc(toastProduct)} 
                   alt={toastProduct.name} 
                   className="me-2 rounded" 
                   width="40" 
@@ -127,7 +128,7 @@ const Home = ({ selectedCategory }) => {
                   <div className={`card h-100 shadow-sm ${!productAvailable ? 'bg-light' : ''}`}>
                     <Link to={`/product/${id}`} className="text-decoration-none text-dark">
                       <img
-                        src={convertBase64ToDataURL(productImage)} 
+                        src={getProductImageSrc(product)}
                         alt={name}
                         className="card-img-top p-2"
                         style={{ height: "150px", objectFit: "cover" }}

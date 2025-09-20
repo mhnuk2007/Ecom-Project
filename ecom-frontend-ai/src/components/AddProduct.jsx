@@ -380,6 +380,7 @@ const AddProduct = () => {
                     <option value="">Select category</option>
                     <option value="Laptop">Laptop</option>
                     <option value="Headphone">Headphone</option>
+                    <option value="Accessories">Accessories</option>
                     <option value="Mobile">Mobile</option>
                     <option value="Electronics">Electronics</option>
                     <option value="Toys">Toys</option>
