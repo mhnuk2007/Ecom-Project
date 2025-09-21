@@ -82,7 +82,7 @@ public class ProductService {
                     savedProduct.getStockQuantity()
             );
 
-            System.out.println("Creating document with content: " + content);
+            System.out.println("[PRODUCT SERVICE] Creating document with content: " + content);
 
             Document document = new Document(
                     UUID.randomUUID().toString(),
@@ -90,12 +90,12 @@ public class ProductService {
                     Map.of("productId", String.valueOf(savedProduct.getId()))
             );
 
-            System.out.println("Adding document to vector store: " + document.getId());
+            System.out.println("[PRODUCT SERVICE] Adding document to vector store: " + document.getId());
             vectorStore.add(List.of(document));
-            System.out.println("Successfully added document to vector store");
+            System.out.println("[PRODUCT SERVICE] Successfully added document to vector store");
 
         } catch (Exception e) {
-            System.err.println("Failed to add document to vector store: " + e.getMessage());
+            System.err.println("[PRODUCT SERVICE] Failed to add document to vector store: " + e.getMessage());
             e.printStackTrace();
             // Don't fail the entire operation for vector store issues
         }
