@@ -3,15 +3,17 @@ package com.learning.springecom.service;
 import com.learning.springecom.model.Product;
 import com.learning.springecom.repo.ProductRepo;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.ResponseEntity;
+import org.springframework.ai.document.Document;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @Service
 public class ProductService {
@@ -25,6 +27,9 @@ public class ProductService {
     @Autowired
     private AiImageGenService aiImageGenService;
 
+    @Autowired
+    private VectorStore vectorStore;
+
     public List<Product> getAllProducts() {
         return productRepo.findAll();
 
@@ -35,14 +40,14 @@ public class ProductService {
 
     }
 
+    @Transactional
     public Product addOrUpdateProduct(Product product, MultipartFile image) throws IOException {
-        // Only update image fields if a new image is provided
+        // Your existing image handling code...
         if (image != null && !image.isEmpty()) {
             product.setImageName(image.getOriginalFilename());
             product.setImageType(image.getContentType());
             product.setImageData(image.getBytes());
         } else if (product.getId() > 0) {
-            // For updates, preserve existing image data if no new image provided
             Product existingProduct = productRepo.findById(product.getId()).orElse(null);
             if (existingProduct != null) {
                 product.setImageName(existingProduct.getImageName());
@@ -50,9 +55,53 @@ public class ProductService {
                 product.setImageData(existingProduct.getImageData());
             }
         }
-        return productRepo.save(product);
-    }
 
+        Product savedProduct = productRepo.save(product);
+        System.out.println("Product saved with ID: " + savedProduct.getId());
+
+        // Create embedding with detailed logging
+        try {
+            String content = String.format(
+                    """
+                    Product Name: %s
+                    Description: %s
+                    Brand: %s
+                    Price: %s
+                    Category: %s
+                    ReleaseDate: %s
+                    Available: %s
+                    Stock: %s
+                    """,
+                    savedProduct.getName(),
+                    savedProduct.getDescription(),
+                    savedProduct.getBrand(),
+                    savedProduct.getPrice(),
+                    savedProduct.getCategory(),
+                    savedProduct.getReleaseDate(),
+                    savedProduct.isProductAvailable(),
+                    savedProduct.getStockQuantity()
+            );
+
+            System.out.println("Creating document with content: " + content);
+
+            Document document = new Document(
+                    UUID.randomUUID().toString(),
+                    content,
+                    Map.of("productId", String.valueOf(savedProduct.getId()))
+            );
+
+            System.out.println("Adding document to vector store: " + document.getId());
+            vectorStore.add(List.of(document));
+            System.out.println("Successfully added document to vector store");
+
+        } catch (Exception e) {
+            System.err.println("Failed to add document to vector store: " + e.getMessage());
+            e.printStackTrace();
+            // Don't fail the entire operation for vector store issues
+        }
+
+        return savedProduct;
+    }
 
     public void deleteProduct(int id) {
         productRepo.deleteById(id);
@@ -105,7 +154,7 @@ public class ProductService {
                      - Follow the typical visual style of top e-commerce websites like Amazon, Flipkart, or Shopify.
                      - Make the product appear life-like and professionally photographed in a studio setup.
                      - The final image should look immediately ready for use on an e-commerce website without further editing.
-                     """, category, name, description);
+                """, category, name, description);
 
         byte[] aiImage = aiImageGenService.generateImage(imagePrompt);
         return aiImage;
